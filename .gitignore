@@ -1,0 +1,5 @@
+*.egg-info
+_build
+__pycache__
+*.sw?
+generated

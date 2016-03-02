@@ -16,3 +16,4 @@ For learning how to use IonSimPy, see also :ref:`user`.
 .. toctree::
    :maxdepth: 2
 
+   classes
