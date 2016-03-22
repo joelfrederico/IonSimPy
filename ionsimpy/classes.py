@@ -53,6 +53,7 @@ class Particles(object):
         """
         return self._zp
 
+
 class Ions(Particles):
     """
     A class for loading electron beam particles.
@@ -75,12 +76,35 @@ class Ions(Particles):
 
     @property
     def x(self):
-        return self._data[:, :, 0];
+        return self._data[:, :, 0]
+
+
+class Field(object):
+    """
+    A class for handling fields.
+    """
+    def __init__(self, field_obj):
+        self._Ex = field_obj['Ex'].value
+
+    @property
+    def Ex(self):
+        return self._Ex
+
+
+class Step(object):
+    def __init__(self, step_obj):
+        for key in step_obj.keys():
+            if key == 'field':
+                setattr(self, 'field', Field(step_obj['field']))
+
 
 class Sim(object):
     def __init__(self, filename):
+
         self.file = _h5.File(filename)
-        self.ions = Ions(self.file)
+
+        for key in self.file.keys():
+            setattr(self, key, Step(self.file[key]))
 
         for key in self.file.attrs.keys():
             setattr(self, key, self.file.attrs[key][0])
