@@ -4,59 +4,63 @@ import numpy as _np
 
 class Particles(object):
     def __init__(self, particles):
-        self._x   = particles[:, 0]
-        self._xp  = particles[:, 1]
-        self._y   = particles[:, 2]
-        self._yp  = particles[:, 3]
-        self._z   = particles[:, 4]
-        self._zp  = particles[:, 5]
+        self._particles = particles
+        # self._x   = particles[:, 0]
+        # self._xp  = particles[:, 1]
+        # self._y   = particles[:, 2]
+        # self._yp  = particles[:, 3]
+        # self._z   = particles[:, 4]
+        # self._zp  = particles[:, 5]
 
     @property
     def x(self):
         """
         Beam particles coordinates :math:`x`.
         """
-        return self._x
+        return self._particles.value[:, 0]
 
     @property
     def xp(self):
         """
         Beam particles coordinates :math:`x'`.
         """
-        return self._xp
+        return self._particles.value[:, 1]
 
     @property
     def y(self):
         """
         Beam particles coordinates :math:`y`.
         """
-        return self._y
+        return self._particles.value[:, 2]
 
     @property
     def yp(self):
         """
         Beam particles coordinates :math:`y'`.
         """
-        return self._yp
+        return self._particles.value[:, 3]
+        # return self._yp
 
     @property
     def z(self):
         """
         Beam particles coordinates :math:`z`.
         """
-        return self._z
+        return self._particles.value[:, 4]
+        # return self._z
 
     @property
     def zp(self):
         """
         Beam particles coordinates :math:`z'`.
         """
-        return self._zp
+        return self._particles.value[:, 5]
+        # return self._zp
 
 
 class Ions(Particles):
     """
-    A class for loading electron beam particles.
+    A class for loading ion particles.
 
     Parameters
     ----------
@@ -79,23 +83,47 @@ class Ions(Particles):
         return self._data[:, :, 0]
 
 
+class Beam_Electrons(Particles):
+    """
+    A class for loading beam electrons.
+    """
+    def __init__(self, beam_obj):
+        self._particles = beam_obj
+        super().__init__(self._particles)
+
+    @property
+    def particles(self):
+        return self._particles
+
+
 class Field(object):
     """
     A class for handling fields.
     """
     def __init__(self, field_obj):
-        self._Ex = field_obj['Ex'].value
+        self._Ex = _np.transpose(field_obj['Ex'].value)
+        self._Ey = _np.transpose(field_obj['Ey'].value)
 
     @property
     def Ex(self):
         return self._Ex
 
+    @property
+    def Ey(self):
+        return self._Ey
+
 
 class Step(object):
     def __init__(self, step_obj):
+        self._step_obj = step_obj
+
         for key in step_obj.keys():
             if key == 'field':
                 setattr(self, 'field', Field(step_obj['field']))
+            elif key == 'ebeam':
+                setattr(self, 'ebeam', Beam_Electrons(step_obj['ebeam']))
+            elif key == 'ions':
+                setattr(self, 'ions', Beam_Electrons(step_obj['ions']))
 
 
 class Sim(object):
