@@ -104,6 +104,9 @@ class Field(object):
         self._Ex = _np.transpose(field_obj['Ex'].value)
         self._Ey = _np.transpose(field_obj['Ey'].value)
 
+        for key in field_obj.attrs.keys():
+            setattr(self, key, field_obj.attrs[key][0])
+
     @property
     def Ex(self):
         return self._Ex
