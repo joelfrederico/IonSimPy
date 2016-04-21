@@ -3,14 +3,17 @@ import numpy as _np
 
 
 class Particles(object):
+    """
+    Fundamental class containing particles.
+    """
     def __init__(self, particles):
         self._particles = particles
-        # self._x   = particles[:, 0]
-        # self._xp  = particles[:, 1]
-        # self._y   = particles[:, 2]
-        # self._yp  = particles[:, 3]
-        # self._z   = particles[:, 4]
-        # self._zp  = particles[:, 5]
+        self._x   = particles[:, 0]
+        self._xp  = particles[:, 1]
+        self._y   = particles[:, 2]
+        self._yp  = particles[:, 3]
+        self._z   = particles[:, 4]
+        self._zp  = particles[:, 5]
 
     @property
     def x(self):
@@ -58,7 +61,7 @@ class Particles(object):
         # return self._zp
 
 
-class Ions(Particles):
+class Ions(object):
     """
     A class for loading ion particles.
 
@@ -68,19 +71,11 @@ class Ions(Particles):
     filename : str
         Filename holding ion particles.
     """
-    def __init__(self, file):
-        self.file       = file
-        self._ion_group = self.file['ions']
-        n_keys          = len(self._ion_group)
-        dataset_list = list(self._ion_group)
-        n_parts = self._ion_group[dataset_list[0]].shape[0]
-        self._data = _np.empty((n_keys, n_parts, 6), dtype=float)
-        for i in range(n_keys):
-            self._data[i, :, :] = self._ion_group['step_{:03d}'.format(i)].value
+    def __init__(self, step_obj):
+        self._step_obj = step_obj
 
-    @property
-    def x(self):
-        return self._data[:, :, 0]
+        for key in step_obj.keys():
+            setattr(self, key, I_Step(step_obj[key]))
 
 
 class Beam_Electrons(Particles):
@@ -107,35 +102,61 @@ class Field(object):
         for key in field_obj.attrs.keys():
             setattr(self, key, field_obj.attrs[key][0])
 
-    @property
-    def Ex(self):
-        return self._Ex
+    def Ex(self, index):
+        """
+        The ::math::`$x$` component
+        """
+        return self._Ex[index, :, :]
+
+    def Ey(self, index):
+        return self._Ey[index, :, :]
+
+
+class I_Step(Particles):
+    """
+    Class for each step in ion motion integration.
+    """
+    def __init__(self, step_obj):
+        super().__init__(step_obj)
+        self._step_obj = step_obj
+
+        self._step = step_obj.attrs['Step']
 
     @property
-    def Ey(self):
-        return self._Ey
+    def particles(self):
+        return self._particles
+
+    @property
+    def step(self):
+        return self._step
 
 
-class Step(object):
+class E_Step(object):
+    """
+    Class for each step in electron motion integration.
+    """
     def __init__(self, step_obj):
         self._step_obj = step_obj
 
         for key in step_obj.keys():
             if key == 'field':
                 setattr(self, 'field', Field(step_obj['field']))
-            elif key == 'ebeam':
-                setattr(self, 'ebeam', Beam_Electrons(step_obj['ebeam']))
-            elif key == 'ions':
-                setattr(self, 'ions', Beam_Electrons(step_obj['ions']))
+            elif key == 'electrons':
+                setattr(self, 'electrons', Beam_Electrons(step_obj['electrons']))
+            elif key == 'ions_steps':
+                setattr(self, 'ions_steps', Ions(step_obj['ions_steps']))
 
 
 class Sim(object):
+    """
+    Container for simulation.
+    """
     def __init__(self, filename):
 
-        self.file = _h5.File(filename)
+        self.file = _h5.File(filename, 'r')
 
         for key in self.file.keys():
-            setattr(self, key, Step(self.file[key]))
+            setattr(self, key, E_Step(self.file[key]))
 
         for key in self.file.attrs.keys():
-            setattr(self, key, self.file.attrs[key][0])
+            setattr(self, key, self.file.attrs[key])

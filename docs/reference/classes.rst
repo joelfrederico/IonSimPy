@@ -8,10 +8,23 @@ Classes
 
 These modules allow for easy access to particle dumps.
 
-Conversion
-``````````
+Steps
+`````
 
 .. autosummary::
    :toctree: ./generated/
 
-   Ebeam
+   Sim
+   E_Step
+   I_Step
+
+Data
+````
+
+.. autosummary::
+   :toctree: ./generated/
+
+   Beam_Electrons
+   Field
+   Ions
+   Particles
