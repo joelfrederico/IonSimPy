@@ -65,23 +65,26 @@ def readfield(filename):
     slider.on_changed(update)
     fig.canvas.mpl_connect('key_press_event', press)
     fig.canvas.mpl_connect('scroll_event', scroll)
-    
+
     _plt.show()
 
     return sim
 
 
 def update_plot(ax, step1, index):
-    Dat_Ex = step1.field.Ex(index)
-    Dat_Ey = step1.field.Ey(index)
+    field = step1.field
+    Dat_Ex = field.Ex(index)
+    Dat_Ey = field.Ey(index)
     # ================================
     # Plot Data
     # ================================
     vmag = 0.1
     # rbkwargs = {"vmin": -vmag, "vmax": vmag, "cmap": "RdBu"}
     rbkwargs = {"cmap": "RdBu", "add_cbar": False}
-    
-    genkwargs = {"add_cbar": False}
+
+    extent = _np.array([field.x_grid[0], field.x_grid[-1], field.y_grid[0], field.y_grid[-1]]) * 1e6
+
+    genkwargs = {"add_cbar": False, "extent": extent}
     
     Dat_Em = _np.sqrt(Dat_Ex**2+Dat_Ey**2)
     # Dat_Em = Dat_Ex
@@ -105,19 +108,19 @@ def update_plot(ax, step1, index):
     # Basetti-Erskine
     # ================================
     
-    sr = _np.mean([2.42769e-6, 2.44567e-6])
+    # sr = _np.mean([2.42769e-6, 2.44567e-6])
+    sr = 2.4276628847185805e-06
+
     sx = 2.44568e-6
     sy = 2.42769e-6
     # var_x = sx**2
     # var_y = sy**2
     # var_x_minus_var_y = var_x-var_y
     
-    lim = 10*sr
-    # n_pts = 201
     n_pts = Dat_Ex.shape[0]
     
-    xvals = _np.linspace(-lim, lim, n_pts)
-    yvals = _np.linspace(-lim, lim, n_pts)
+    xvals = field.x_grid
+    yvals = field.y_grid
     
     BE_Emag = _np.empty((n_pts, n_pts))
     BE_Ex_plot = _np.empty((n_pts, n_pts))
@@ -173,7 +176,6 @@ def update_plot(ax, step1, index):
     _sm.imshow(toplot, ax=axc, vmin=-vmag, vmax=vmag, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="% Diff: Ex")
     
-    # vmag = 0.005
     toplot = (Dat_Ey-BE_Ey_plot)/Dat_Ey
     toplot[:, (n_pts-1)/2] = 0
     vmag = _np.max(_np.sqrt(toplot**2))
@@ -188,10 +190,9 @@ def update_plot(ax, step1, index):
     # sr = _np.mean([sx, sy])
     sr = _np.mean([2.42769e-6, 2.44567e-6])
     # sr = 1
-    lim = 10*sr
     
-    xvals = _np.linspace(-lim, lim, n_pts)
-    yvals = _np.linspace(-lim, lim, n_pts)
+    xvals = field.x_grid
+    yvals = field.y_grid
     
     Emag = _np.empty((n_pts, n_pts))
     Ex_plot = _np.empty((n_pts, n_pts))

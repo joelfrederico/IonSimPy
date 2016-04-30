@@ -98,19 +98,49 @@ class Field(object):
     def __init__(self, field_obj):
         self._Ex = _np.transpose(field_obj['Ex'].value)
         self._Ey = _np.transpose(field_obj['Ey'].value)
+        self._Ez = _np.transpose(field_obj['Ez'].value)
 
         for key in field_obj.attrs.keys():
-            setattr(self, key, field_obj.attrs[key][0])
+            setattr(self, key, field_obj.attrs[key])
 
     def Ex(self, index):
         """
-        The ::math::`$x$` component
+        The ::math::`$E_x$` component of the electric field ::math::`$\vec{E}$`.
         """
         return self._Ex[index, :, :]
 
     def Ey(self, index):
+        """
+        The ::math::`$E_y$` component of the electric field ::math::`$\vec{E}$`.
+        """
         return self._Ey[index, :, :]
 
+    def Ez(self, index):
+        """
+        The ::math::`$E_z$` component of the electric field ::math::`$\vec{E}$`.
+        """
+        return self._Ez[index, :, :]
+
+    # @property
+    # def x_grid(self):
+    #     """
+    #     The coordinates for each grid point in the field ::math::`$E_x`.
+    #     """
+    #     return self._x_grid
+
+    # @property
+    # def y_grid(self):
+    #     """
+    #     The coordinates for each grid point in the field ::math::`$E_y`.
+    #     """
+    #     return self._y_grid
+
+    # @property
+    # def z_grid(self):
+    #     """
+    #     The coordinates for each grid point in the field ::math::`$E_z`.
+    #     """
+    #     return self._z_grid
 
 class I_Step(Particles):
     """
