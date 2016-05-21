@@ -8,8 +8,6 @@ import scipy.constants as _spc
 from matplotlib.gridspec import GridSpec as _GridSpec
 import matplotlib.widgets as _wid
 
-q = 2e10 * _spc.elementary_charge/_spc.epsilon_0
-
 
 def readfield(filename):
     # filename = 'large.h5'
@@ -18,6 +16,8 @@ def readfield(filename):
     sim    = _cl.Sim(filename)
     step1 = sim.Step_0000
     n_field = sim.n_field_z
+
+    q = sim.q_tot * _spc.elementary_charge / ( _spc.epsilon_0 * sim.sz )
 
     # ================================
     # Setup plot
@@ -50,8 +50,10 @@ def readfield(filename):
         elif index > smax:
             index = smax
             slider.set_val(index)
+
+        index = _np.int(index)
     
-        update_plot(ax, step1, index)
+        update_plot(ax, q, step1, index)
 
     def press(event):
         if event.key == 'right':
@@ -71,7 +73,7 @@ def readfield(filename):
     return sim
 
 
-def update_plot(ax, step1, index):
+def update_plot(ax, q, step1, index):
     field = step1.field
     Dat_Ex = field.Ex(index)
     Dat_Ey = field.Ey(index)
@@ -80,7 +82,7 @@ def update_plot(ax, step1, index):
     # ================================
     vmag = 0.1
     # rbkwargs = {"vmin": -vmag, "vmax": vmag, "cmap": "RdBu"}
-    rbkwargs = {"cmap": "RdBu", "add_cbar": False}
+    rbkwargs = {"cmap": "RdBu", "add_cbar": True}
 
     extent = _np.array([field.x_grid[0], field.x_grid[-1], field.y_grid[0], field.y_grid[-1]]) * 1e6
 
@@ -166,18 +168,21 @@ def update_plot(ax, step1, index):
     # Difference
     # ================================
     axc = ax[2, 0]
-    _sm.imshow((Dat_Em-BE_Emag)/Dat_Em, ax=axc, **rbkwargs)
+    toplot = (Dat_Em-BE_Emag)/Dat_Em
+    toplot[_np.int((n_pts-1)/2), :] = 0
+    vmag = _np.max(_np.abs(toplot))
+    _sm.imshow(toplot, ax=axc, vmin=-vmag, vmax=vmag, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="% Diff: E_mag")
     
     toplot = (Dat_Ex-BE_Ex_plot)/Dat_Ex
-    toplot[(n_pts-1)/2, :] = 0
+    toplot[_np.int((n_pts-1)/2), :] = 0
     vmag = _np.max(_np.sqrt(toplot**2))
     axc = ax[2, 1]
     _sm.imshow(toplot, ax=axc, vmin=-vmag, vmax=vmag, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="% Diff: Ex")
     
     toplot = (Dat_Ey-BE_Ey_plot)/Dat_Ey
-    toplot[:, (n_pts-1)/2] = 0
+    toplot[:, _np.int((n_pts-1)/2)] = 0
     vmag = _np.max(_np.sqrt(toplot**2))
     axc = ax[2, 2]
     _sm.imshow(toplot, ax=axc, vmin=-vmag, vmax=vmag, **rbkwargs)

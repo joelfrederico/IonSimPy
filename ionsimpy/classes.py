@@ -142,6 +142,7 @@ class Field(object):
     #     """
     #     return self._z_grid
 
+
 class I_Step(Particles):
     """
     Class for each step in ion motion integration.
