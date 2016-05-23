@@ -81,11 +81,10 @@ def update_plot(ax, q, step1, index):
     # Plot Data
     # ================================
     vmag = 0.1
-    # rbkwargs = {"vmin": -vmag, "vmax": vmag, "cmap": "RdBu"}
-    rbkwargs = {"cmap": "RdBu", "add_cbar": True}
-
     extent = _np.array([field.x_grid[0], field.x_grid[-1], field.y_grid[0], field.y_grid[-1]]) * 1e6
 
+    # rbkwargs = {"vmin": -vmag, "vmax": vmag, "cmap": "RdBu"}
+    rbkwargs = {"cmap": "RdBu", "add_cbar": True, "extent": extent}
     genkwargs = {"add_cbar": False, "extent": extent}
     
     Dat_Em = _np.sqrt(Dat_Ex**2+Dat_Ey**2)
