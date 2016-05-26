@@ -70,7 +70,7 @@ def readfield(filename):
 
     _plt.show()
 
-    return sim
+    return ax
 
 
 def update_plot(ax, q, step1, index):
@@ -90,17 +90,20 @@ def update_plot(ax, q, step1, index):
     Dat_Em = _np.sqrt(Dat_Ex**2+Dat_Ey**2)
     # Dat_Em = Dat_Ex
     axc = ax[0, 0]
+    axc.clear()
     
     _sm.imshow(Dat_Em, ax=axc, **genkwargs)
     _sm.addlabel(ax=axc, toplabel="Data: Em")
     
     axc = ax[0, 1]
+    axc.clear()
     
     _sm.imshow(Dat_Ex, ax=axc, **rbkwargs)
     # _sm.contour(Dat_Ex, ax=axc, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="Data: Ex")
     
     axc = ax[0, 2]
+    axc.clear()
     
     _sm.imshow(Dat_Ey, ax=axc, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="Data: Ey")
@@ -152,14 +155,17 @@ def update_plot(ax, q, step1, index):
     BE_Emag    = BE_Emag.transpose()
     
     axc = ax[1, 0]
+    axc.clear()
     _sm.imshow(BE_Emag, ax=axc, **genkwargs)
     _sm.addlabel(ax=axc, toplabel="B/E: E_mag")
     
     axc = ax[1, 1]
+    axc.clear()
     _sm.imshow(BE_Ex_plot, ax=axc, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="B/E: Ex")
     
     axc = ax[1, 2]
+    axc.clear()
     _sm.imshow(BE_Ey_plot, ax=axc, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="B/E: Ey")
     
@@ -167,6 +173,7 @@ def update_plot(ax, q, step1, index):
     # Difference
     # ================================
     axc = ax[2, 0]
+    axc.clear()
     toplot = (Dat_Em-BE_Emag)/Dat_Em
     toplot[_np.int((n_pts-1)/2), :] = 0
     vmag = _np.max(_np.abs(toplot))
@@ -177,6 +184,7 @@ def update_plot(ax, q, step1, index):
     toplot[_np.int((n_pts-1)/2), :] = 0
     vmag = _np.max(_np.sqrt(toplot**2))
     axc = ax[2, 1]
+    axc.clear()
     _sm.imshow(toplot, ax=axc, vmin=-vmag, vmax=vmag, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="% Diff: Ex")
     
@@ -184,6 +192,7 @@ def update_plot(ax, q, step1, index):
     toplot[:, _np.int((n_pts-1)/2)] = 0
     vmag = _np.max(_np.sqrt(toplot**2))
     axc = ax[2, 2]
+    axc.clear()
     _sm.imshow(toplot, ax=axc, vmin=-vmag, vmax=vmag, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="% Diff: Ey")
     
@@ -219,13 +228,16 @@ def update_plot(ax, q, step1, index):
             Ey_plot[i, j] = Em * y/r
     
     axc = ax[3, 0]
+    axc.clear()
     _sm.imshow(Emag, ax=axc, **genkwargs)
     _sm.addlabel(ax=axc, toplabel="Radial Sym.: E_mag")
     
     axc = ax[3, 1]
+    axc.clear()
     _sm.imshow(Ex_plot, ax=axc, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="Radial Sym.: Ex")
     
     axc = ax[3, 2]
+    axc.clear()
     _sm.imshow(Ey_plot, ax=axc, **rbkwargs)
     _sm.addlabel(ax=axc, toplabel="Radial Sym.: Ey")
